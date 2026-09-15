@@ -136,6 +136,10 @@
     display:none;
   }
   .demo-banner.show{display:block;}
+  .sync-status{margin-top:8px;font-size:11px;color:var(--muted-2);font-family:'IBM Plex Mono',monospace;}
+  .sync-status.ok{color:var(--grade-a);}
+  .sync-status.error{color:var(--grade-d);}
+  .report-id{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--muted);margin-top:4px;}
 
   @media (max-width: 820px){
     main{flex-direction:column;}
@@ -190,6 +194,7 @@
         <div id="locStatus">No location set yet</div>
 
         <button id="submitBtn" disabled>Submit report</button>
+        <div id="syncStatus" class="sync-status">Connecting to WardPulse data service…</div>
       </div>
 
       <div class="section">
@@ -208,29 +213,26 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
 <script>
 (function(){
-  // ---------------------------------------------------------------
-  // FILL THESE TWO IN to make reports shared and public for everyone.
-  // Get them from Supabase → Project Settings → API.
-  // Until both are filled in, the app runs in local demo mode:
-  // it still works, but reports only exist in your own browser tab
-  // and reset if you reload.
-  // ---------------------------------------------------------------
   const SUPABASE_URL = 'https://hdydeuldzdxrpknzlgam.supabase.co';
-   const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhkeWRldWxkemR4cnBrbnpsZ2FtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODk0OTM4NzIsImV4cCI6MjEwNTA2OTg3Mn0.J36HJ-2LYgX-AVLI3Y428aT3h6REI7zQyRV-aWZrA-s'; 
-
+  const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhkeWRldWxkemR4cnBrbnpsZ2FtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODk0OTM4NzIsImV4cCI6MjEwNTA2OTg3Mn0.J36HJ-2LYXg-AVLI3Y428aT3h6REI7zQyRV-aWZrA-s';
   const DEMO_MODE = !SUPABASE_URL || !SUPABASE_ANON_KEY;
   const supa = DEMO_MODE ? null : window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
   const TYPE_COLORS = {power:'#C9660E', water:'#3E6E96', light:'#6E5AA6', other:'#7A837D'};
   const TYPE_LABELS = {power:'Power cut', water:'Water leak', light:'Streetlight', other:'Other'};
-
   const SEED_LOCALITIES = {
-    'Karad - MIDC Road': [17.2891, 74.1815],
-    'Islampur - Bazar Peth': [17.0350, 74.2350],
-    'Sangli - Vishrambaug': [16.8524, 74.5815],
-    'Satara - Powai Naka': [17.6805, 74.0183],
-    'Kolhapur - Rajarampuri': [16.6950, 74.2320]
+    'Karad - MIDC Road':[17.289,74.181],
+    'Satara - Powai Naka':[17.682,74.018],
+    'Islampur - Bazar Peth':[17.048,74.266],
+    'Sangli - Vishrambaug':[16.852,74.581],
+    'Kolhapur - Rajarampuri':[16.705,74.243]
   };
+
+  let reports = [];
+  let map, markersLayer, pendingCoord = null, pickMode = false, pendingMarker = null, selectedType = null;
+  let demoReports = null;
+  let isSubmitting = false;
+  let refreshTimer = null;
 
   function daysAgo(n){ return Date.now() - n*24*60*60*1000 + Math.floor(Math.random()*6*60*60*1000); }
   function jitter(v){ return v + (Math.random()-0.5)*0.006; }
@@ -243,31 +245,32 @@
       ['Sangli - Vishrambaug', 'light', 2, 15],
       ['Kolhapur - Rajarampuri', 'other', 1, 5]
     ];
-    const reports = [];
+    const seeded = [];
     let id = 1;
     plan.forEach(([loc, mainType, count, spanDays]) => {
       const [lat, lng] = SEED_LOCALITIES[loc];
       for(let i=0;i<count;i++){
         const type = (i % 4 === 0 && count > 3) ? 'other' : mainType;
-        reports.push({
-          id: 'seed-' + id++,
-          type, locality: loc,
+        seeded.push({
+          id: 'seed-' + id++, type, locality: loc,
           note: i===0 ? 'Recurring issue reported by multiple residents.' : '',
-          lat: jitter(lat), lng: jitter(lng),
-          ts: daysAgo(Math.floor(Math.random()*spanDays))
+          lat: jitter(lat), lng: jitter(lng), ts: daysAgo(Math.floor(Math.random()*spanDays))
         });
       }
     });
-    return reports;
+    return seeded;
   }
 
-  let reports = [];
-  let map, markersLayer, pendingCoord = null, pickMode = false, pendingMarker = null, selectedType = null;
+  function setSyncStatus(message, state=''){
+    const el = document.getElementById('syncStatus');
+    el.textContent = message;
+    el.className = 'sync-status' + (state ? ' ' + state : '');
+  }
 
   function initMap(){
     map = L.map('map', {zoomControl:true, attributionControl:true}).setView([17.11, 74.25], 9);
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      attribution: '&copy; OpenStreetMap contributors', subdomains:'abc', maxZoom:19
+      attribution:'&copy; OpenStreetMap contributors', subdomains:'abc', maxZoom:19
     }).addTo(map);
     markersLayer = L.layerGroup().addTo(map);
     map.on('click', function(e){
@@ -292,9 +295,13 @@
   function typeColor(t){ return TYPE_COLORS[t] || TYPE_COLORS.other; }
 
   function relativeTime(ts){
-    const diff = Date.now() - ts;
-    const days = Math.floor(diff / (24*60*60*1000));
-    if(days <= 0) return 'today';
+    const diff = Math.max(0, Date.now() - Number(ts));
+    const minutes = Math.floor(diff / 60000);
+    if(minutes < 1) return 'just now';
+    if(minutes < 60) return minutes + ' min ago';
+    const hours = Math.floor(minutes / 60);
+    if(hours < 24) return hours + ' hr' + (hours===1?'':'s') + ' ago';
+    const days = Math.floor(hours / 24);
     if(days === 1) return '1 day ago';
     if(days < 30) return days + ' days ago';
     return Math.floor(days/30) + ' mo ago';
@@ -304,13 +311,13 @@
     const cutoff = Date.now() - 30*24*60*60*1000;
     const groups = {};
     reports.forEach(r => {
-      if(r.ts < cutoff) return;
+      if(!Number.isFinite(Number(r.ts)) || Number(r.ts) < cutoff) return;
       const key = r.locality.trim();
       if(!groups[key]) groups[key] = [];
       groups[key].push(r);
     });
     const rows = Object.keys(groups).map(loc => {
-      const list = groups[loc].sort((a,b) => b.ts - a.ts);
+      const list = groups[loc].sort((a,b) => Number(b.ts) - Number(a.ts));
       const count = list.length;
       let grade, color;
       if(count <= 2){ grade='A'; color='#2F8A75'; }
@@ -319,67 +326,74 @@
       else { grade='D'; color='#B23A3A'; }
       const typeCounts = {};
       list.forEach(r => typeCounts[r.type] = (typeCounts[r.type]||0)+1);
-      const topType = Object.keys(typeCounts).sort((a,b)=>typeCounts[b]-typeCounts[a])[0];
-      return {loc, count, grade, color, topType, lastTs: list[0].ts};
+      const topType = Object.keys(typeCounts).sort((a,b)=>typeCounts[b]-typeCounts[a])[0] || 'other';
+      return {loc, count, grade, color, topType, lastTs: Number(list[0].ts)};
     });
     rows.sort((a,b) => b.count - a.count);
     return rows;
   }
 
+  function distanceMeters(a,b){
+    const R=6371000;
+    const p1=a.lat*Math.PI/180, p2=b.lat*Math.PI/180;
+    const dp=(b.lat-a.lat)*Math.PI/180, dl=(b.lng-a.lng)*Math.PI/180;
+    const x=Math.sin(dp/2)**2 + Math.cos(p1)*Math.cos(p2)*Math.sin(dl/2)**2;
+    return 2*R*Math.atan2(Math.sqrt(x),Math.sqrt(1-x));
+  }
+
+  function findPossibleDuplicate(type, locality, coord){
+    const cutoff = Date.now() - 6*60*60*1000;
+    return reports.find(r =>
+      r.type === type &&
+      Number(r.ts) >= cutoff &&
+      distanceMeters(coord, {lat:Number(r.lat), lng:Number(r.lng)}) <= 150
+    );
+  }
+
   function render(){
-    // markers
     markersLayer.clearLayers();
     reports.forEach(r => {
-      L.circleMarker([r.lat, r.lng], {
+      const lat=Number(r.lat), lng=Number(r.lng);
+      if(!Number.isFinite(lat) || !Number.isFinite(lng)) return;
+      L.circleMarker([lat, lng], {
         radius:6, color:typeColor(r.type), weight:1.5,
         fillColor:typeColor(r.type), fillOpacity:0.6
       }).bindPopup(
         '<strong>' + TYPE_LABELS[r.type] + '</strong><br>' + escapeHtml(r.locality) +
         (r.note ? '<br><span style="color:#5B6660">' + escapeHtml(r.note) + '</span>' : '') +
-        '<br><span style="color:#8B948E;font-size:11px">' + relativeTime(r.ts) + '</span>'
+        '<br><span style="color:#8B948E;font-size:11px">' + relativeTime(r.ts) + '</span>' +
+        (r.id ? '<div class="report-id">Report ' + escapeHtml(String(r.id).slice(0,8)) + '</div>' : '')
       ).addTo(markersLayer);
     });
 
-    // scoreboard
     const rows = computeScores();
     const sbEl = document.getElementById('scoreboard');
-    if(rows.length === 0){
-      sbEl.innerHTML = '<div class="empty">No reports yet in the last 30 days.</div>';
-    } else {
-      sbEl.innerHTML = rows.map(r => `
-        <div class="scoreboard-item">
-          <div class="grade-badge" style="background:${r.color}22;color:${r.color};border:1px solid ${r.color}55">${r.grade}</div>
-          <div class="sb-info">
-            <div class="sb-name">${escapeHtml(r.loc)}</div>
-            <div class="sb-meta">${r.count} report${r.count===1?'':'s'} · mostly ${TYPE_LABELS[r.topType].toLowerCase()} · last ${relativeTime(r.lastTs)}</div>
-          </div>
+    sbEl.innerHTML = rows.length ? rows.map(r => `
+      <div class="scoreboard-item">
+        <div class="grade-badge" style="background:${r.color}22;color:${r.color};border:1px solid ${r.color}55">${r.grade}</div>
+        <div class="sb-info">
+          <div class="sb-name">${escapeHtml(r.loc)}</div>
+          <div class="sb-meta">${r.count} report${r.count===1?'':'s'} · mostly ${TYPE_LABELS[r.topType].toLowerCase()} · last ${relativeTime(r.lastTs)}</div>
         </div>
-      `).join('');
-    }
+      </div>
+    `).join('') : '<div class="empty">No reports yet in the last 30 days.</div>';
 
-    // feed
     const feedEl = document.getElementById('feed');
-    const recent = [...reports].sort((a,b)=>b.ts-a.ts).slice(0,8);
-    if(recent.length === 0){
-      feedEl.innerHTML = '<div class="empty">Nothing reported yet. Be the first.</div>';
-    } else {
-      feedEl.innerHTML = recent.map(r => `
-        <div class="feed-item">
-          <div class="feed-top">
-            <i style="background:${typeColor(r.type)}"></i>
-            <span>${TYPE_LABELS[r.type]} · ${escapeHtml(r.locality)}</span>
-            <span class="feed-time">${relativeTime(r.ts)}</span>
-          </div>
-          ${r.note ? '<div class="feed-note">' + escapeHtml(r.note) + '</div>' : ''}
+    const recent = [...reports].sort((a,b)=>Number(b.ts)-Number(a.ts)).slice(0,8);
+    feedEl.innerHTML = recent.length ? recent.map(r => `
+      <div class="feed-item">
+        <div class="feed-top">
+          <i style="background:${typeColor(r.type)}"></i>
+          <span>${TYPE_LABELS[r.type]} · ${escapeHtml(r.locality)}</span>
+          <span class="feed-time">${relativeTime(r.ts)}</span>
         </div>
-      `).join('');
-    }
+        ${r.note ? '<div class="feed-note">' + escapeHtml(r.note) + '</div>' : ''}
+      </div>
+    `).join('') : '<div class="empty">Nothing reported yet. Be the first.</div>';
 
-    // locality datalist
     const dl = document.getElementById('localityList');
-    const uniq = [...new Set(reports.map(r => r.locality))];
+    const uniq = [...new Set(reports.map(r => r.locality).filter(Boolean))];
     dl.innerHTML = uniq.map(l => `<option value="${escapeHtml(l)}">`).join('');
-
     document.getElementById('liveCount').textContent = reports.length + ' reports tracked';
   }
 
@@ -389,19 +403,18 @@
 
   function updateSubmitState(){
     const locality = document.getElementById('locality').value.trim();
-    const ok = selectedType && locality.length > 0 && pendingCoord;
+    const ok = selectedType && locality.length > 0 && pendingCoord && !isSubmitting;
     document.getElementById('submitBtn').disabled = !ok;
   }
 
-  function showToast(msg){
+  function showToast(msg, isError=false){
     const t = document.createElement('div');
     t.className = 'toast';
+    if(isError) t.style.borderColor = '#B23A3A';
     t.textContent = msg;
     document.getElementById('mapwrap').appendChild(t);
-    setTimeout(() => { t.style.opacity = '0'; setTimeout(()=>t.remove(), 300); }, 2600);
+    setTimeout(() => { t.style.opacity='0'; setTimeout(()=>t.remove(),300); }, 3200);
   }
-
-  let demoReports = null; // in-memory fallback store, this tab only
 
   async function loadReports(){
     if(DEMO_MODE){
@@ -409,49 +422,61 @@
       if(!demoReports) demoReports = buildSeed();
       reports = demoReports;
       render();
+      setSyncStatus('Demo mode — data is not shared', '');
       return;
     }
+
     try {
       const { data, error } = await supa.from('reports').select('*').order('ts', {ascending:false});
       if(error) throw error;
       reports = (data || []).map(r => ({
         id:r.id, type:r.type, locality:r.locality, note:r.note || '',
-        lat:r.lat, lng:r.lng, ts:Number(r.ts)
-      }));
-      if(reports.length === 0){
-        // first ever run — plant the seed data so the map isn't empty
-        reports = buildSeed();
-        await supa.from('reports').insert(reports.map(({id, ...rest}) => rest));
-      }
+        lat:Number(r.lat), lng:Number(r.lng), ts:Number(r.ts)
+      })).filter(r => Number.isFinite(r.lat) && Number.isFinite(r.lng) && r.locality);
+      document.getElementById('demoBanner').classList.remove('show');
+      render();
+      setSyncStatus('✓ Connected to live Supabase data · synced ' + new Date().toLocaleTimeString(), 'ok');
     } catch(e){
-      console.error('Supabase load failed, falling back to demo mode', e);
-      document.getElementById('demoBanner').classList.add('show');
-      reports = buildSeed();
+      console.error('Supabase load failed:', e);
+      reports = [];
+      render();
+      setSyncStatus('⚠ Could not load live reports — check Supabase connection', 'error');
+      showToast('Could not load reports from Supabase.', true);
     }
-    render();
   }
 
   async function saveReport(report){
     if(DEMO_MODE){
+      if(!demoReports) demoReports=[];
       demoReports.push(report);
-      return;
+      return {ok:true, id:report.id};
     }
-    try {
-      const { id, ...rest } = report;
-      const { data, error } = await supa.from('reports').insert([rest]).select();
-      if(error) throw error;
-      if(data && data[0]) report.id = data[0].id;
-    } catch(e){
-      console.error('Supabase save failed, kept locally only', e);
-    }
+    const { id, ...rest } = report;
+    const { data, error } = await supa.from('reports').insert([rest]).select('id, type, locality, note, lat, lng, ts, created_at');
+    if(error) throw error;
+    const saved = data && data[0] ? data[0] : null;
+    if(!saved) throw new Error('Supabase accepted the request but returned no saved row.');
+    return {ok:true, id:saved.id, row:saved};
+  }
+
+  function resetForm(){
+    document.getElementById('locality').value='';
+    document.getElementById('note').value='';
+    document.querySelectorAll('.typebtn').forEach(b=>b.classList.remove('active'));
+    selectedType=null;
+    pendingCoord=null;
+    if(pendingMarker){ map.removeLayer(pendingMarker); pendingMarker=null; }
+    document.getElementById('locStatus').textContent='No location set yet';
+    document.getElementById('locStatus').classList.remove('set');
+    updateSubmitState();
   }
 
   function wireUp(){
     document.querySelectorAll('.typebtn').forEach(btn => {
       btn.addEventListener('click', () => {
-        document.querySelectorAll('.typebtn').forEach(b => b.classList.remove('active'));
+        document.querySelectorAll('.typebtn').forEach(b=>b.classList.remove('active'));
         btn.classList.add('active');
-        selectedType = btn.dataset.type;
+        selectedType=btn.dataset.type;
         updateSubmitState();
       });
     });
@@ -459,52 +484,72 @@
     document.getElementById('locality').addEventListener('input', updateSubmitState);
 
     document.getElementById('btnGeo').addEventListener('click', () => {
-      if(!navigator.geolocation){ showToast('Geolocation not available in this browser.'); return; }
+      if(!navigator.geolocation){ showToast('Geolocation is not available in this browser.', true); return; }
       navigator.geolocation.getCurrentPosition(
         pos => setPendingCoord(pos.coords.latitude, pos.coords.longitude),
-        () => showToast('Could not get your location. Try "Pick on map" instead.')
+        () => showToast('Could not get your location. Try “Pick on map” instead.', true),
+        {enableHighAccuracy:true, timeout:10000, maximumAge:60000}
       );
     });
 
     document.getElementById('btnPick').addEventListener('click', () => {
-      pickMode = !pickMode;
+      pickMode=!pickMode;
       document.getElementById('btnPick').classList.toggle('armed', pickMode);
       if(pickMode) showToast('Click anywhere on the map to drop a pin.');
     });
 
     document.getElementById('submitBtn').addEventListener('click', async () => {
-      const locality = document.getElementById('locality').value.trim();
-      const note = document.getElementById('note').value.trim();
-      if(!selectedType || !locality || !pendingCoord) return;
+      const locality=document.getElementById('locality').value.trim();
+      const note=document.getElementById('note').value.trim();
+      if(!selectedType || !locality || !pendingCoord || isSubmitting) return;
 
-      const newReport = {
-        id: 'r-' + Date.now(),
-        type: selectedType,
-        locality, note,
-        lat: pendingCoord.lat, lng: pendingCoord.lng,
-        ts: Date.now()
-      };
-      reports.push(newReport);
+      const duplicate=findPossibleDuplicate(selectedType, locality, pendingCoord);
+      if(duplicate){
+        const proceed=confirm('A similar ' + TYPE_LABELS[selectedType].toLowerCase() + ' report was submitted nearby within the last 6 hours.\n\nDo you still want to submit this report?\n\nChoose Cancel if you think it is the same incident.');
+        if(!proceed) return;
+      }
 
-      await saveReport(newReport);
-      render();
-      showToast('Report submitted — thanks for flagging it.');
-
-      document.getElementById('locality').value = '';
-      document.getElementById('note').value = '';
-      document.querySelectorAll('.typebtn').forEach(b => b.classList.remove('active'));
-      selectedType = null;
-      pendingCoord = null;
-      if(pendingMarker){ map.removeLayer(pendingMarker); pendingMarker = null; }
-      document.getElementById('locStatus').textContent = 'No location set yet';
-      document.getElementById('locStatus').classList.remove('set');
+      isSubmitting=true;
+      const btn=document.getElementById('submitBtn');
+      btn.textContent='Submitting…';
       updateSubmitState();
+
+      const newReport={
+        type:selectedType,
+        locality,
+        note,
+        lat:pendingCoord.lat,
+        lng:pendingCoord.lng,
+        ts:Date.now()
+      };
+
+      try{
+        const result=await saveReport(newReport);
+        const saved=result.row || {...newReport, id:result.id};
+        reports=[saved, ...reports];
+        render();
+        setSyncStatus('✓ Report saved to Supabase · synced ' + new Date().toLocaleTimeString(), 'ok');
+        showToast('✓ Report submitted successfully · ID ' + String(result.id).slice(0,8));
+        resetForm();
+      }catch(e){
+        console.error('Supabase save failed:', e);
+        setSyncStatus('⚠ Report was not saved — please try again', 'error');
+        showToast('Report could not be saved. Nothing was added to the map.', true);
+      }finally{
+        isSubmitting=false;
+        btn.textContent='Submit report';
+        updateSubmitState();
+      }
     });
   }
 
   initMap();
   wireUp();
   loadReports();
+
+  // Polling keeps the public map synchronized without requiring a separate
+  // Supabase Realtime publication setting. This is intentionally lightweight.
+  refreshTimer=setInterval(loadReports, 15000);
 })();
 </script>
 </body>
