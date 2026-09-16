@@ -237,8 +237,8 @@
   // it still works, but reports only exist in your own browser tab
   // and reset if you reload.
   // ---------------------------------------------------------------
-  const SUPABASE_URL = '';       // e.g. 'https://xxxxxxxx.supabase.co'
-  const SUPABASE_ANON_KEY = '';  // the long 'anon public' key
+  const SUPABASE_URL = 'https://hdydeuldzdxrpknzlgam.supabase.co';
+  const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhkeWRldWxkemR4cnBrbnpsZ2FtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODk0OTM4NzIsImV4cCI6MjEwNTA2OTg3Mn0.J36HJ-2LYgX-AVLI3Y428aT3h6REI7zQyRV-aWZrA-s';  // the long 'anon public' key
 
   const DEMO_MODE = !SUPABASE_URL || !SUPABASE_ANON_KEY;
   const supa = DEMO_MODE ? null : window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
