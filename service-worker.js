@@ -1,4 +1,4 @@
-const CACHE_NAME = 'wardpulse-v1';
+const CACHE_NAME = 'sthaniyaconnect-v1';
 const APP_SHELL = [
   '/',
   '/index.html',
