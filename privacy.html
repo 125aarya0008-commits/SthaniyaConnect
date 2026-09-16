@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SthaniyaConnect — Privacy</title>
+<link rel="icon" href="icons/icon-192.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#F5F6F4; --panel:#FFFFFF; --line:#DBE0DB;
+    --text:#161B1D; --muted:#5B6660; --amber:#C9660E;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;background:var(--bg);color:var(--text);font-family:'IBM Plex Sans',sans-serif;line-height:1.6;}
+  a{color:var(--amber);text-decoration:none;}
+  header{
+    display:flex;align-items:baseline;gap:14px;padding:16px 22px;
+    border-bottom:1px solid var(--line);background:var(--panel);
+  }
+  header h1{font-size:19px;margin:0;font-weight:700;}
+  header h1 span{color:var(--amber);}
+  header a{margin-left:auto;font-size:13px;}
+  main{max-width:640px;margin:0 auto;padding:40px 24px 80px;}
+  h2{font-size:22px;margin:0 0 6px;}
+  .updated{color:var(--muted);font-size:13px;margin:0 0 32px;}
+  h3{font-size:15px;margin:30px 0 8px;}
+  p, li{color:var(--muted);font-size:14px;}
+  ul{padding-left:20px;}
+</style>
+</head>
+<body>
+<header>
+  <h1>Sthaniya<span>Connect</span></h1>
+  <a href="wardpulse.html">← Back to the map</a>
+</header>
+<main>
+  <h2>Privacy &amp; how your data is used</h2>
+  <p class="updated">A plain-language summary, written for a public infrastructure-reporting prototype.</p>
+
+  <h3>What SthaniyaConnect collects</h3>
+  <ul>
+    <li>The issue type you select (power, water, streetlight, other)</li>
+    <li>A locality/area name you type in</li>
+    <li>An optional note you write</li>
+    <li>A location — either your device's GPS coordinates (only if you tap "Use my location") or a point you click on the map</li>
+    <li>The time you submitted the report</li>
+  </ul>
+
+  <h3>What SthaniyaConnect does <em>not</em> collect</h3>
+  <ul>
+    <li>No name, phone number, or email — there is no account or sign-up</li>
+    <li>No continuous location tracking — your location is only used once, at the moment you submit a report</li>
+    <li>No advertising trackers or third-party analytics</li>
+  </ul>
+
+  <h3>Who can see this data</h3>
+  <p>By design, this app is public. Every report you submit — including its location, type, and any note you write — becomes visible to anyone who opens the live map, including municipal officers using the officer view. Please don't include personal information in the note field.</p>
+
+  <h3>How reports are used</h3>
+  <p>Reports are grouped by location to calculate a public "reliability score" for each area, so that recurring problems are visible and harder to ignore. Municipal staff can mark a report as acknowledged or resolved, which is also shown publicly.</p>
+
+  <h3>Flagging and moderation</h3>
+  <p>Anyone can flag a report as inaccurate. Reports that receive multiple flags are automatically hidden from the public score until reviewed, to reduce the impact of spam or mistaken entries.</p>
+
+  <h3>Data storage</h3>
+  <p>Report data is stored in a Supabase database associated with this project. It is not sold or shared with advertisers.</p>
+
+  <h3>Questions</h3>
+  <p>SthaniyaConnect is an independent, citizen-reporting tool. It is not an official government or municipal service, and reports here don't automatically become a formal complaint with your utility provider — think of it as a public record that makes patterns visible. If you have questions about a specific outage, please also use your local ward office's official contact channels.</p>
+</main>
+</body>
+</html>
