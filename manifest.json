@@ -1,4 +1,14 @@
-"icons": [
+{
+  "name": "SthaniyaConnect",
+  "short_name": "Sthaniya",
+  "description": "Report power cuts, water leaks, and streetlight failures. See the pattern, share the score.",
+  "start_url": "/wardpulse.html",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#FEFED0",
+  "theme_color": "#641D36",
+  "icons": [
   {
     "src": "/icons/icon-192.png",
     "sizes": "192x192",
