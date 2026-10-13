@@ -2,7 +2,7 @@
   "name": "SthaniyaConnect",
   "short_name": "Sthaniya",
   "description": "Report power cuts, water leaks, and streetlight failures. See the pattern, share the score.",
-  "start_url": "/wardpulse.html",
+  "start_url": "/",
   "scope": "/",
   "display": "standalone",
   "orientation": "portrait-primary",
