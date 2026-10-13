@@ -1,211 +1,871 @@
 <!DOCTYPE html>
+
+
+
 <html lang="en">
+
+
+
 <head>
+
+
+
 <meta charset="UTF-8">
+
+
+
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>SthaniyaConnect — Officer login</title>
+
+
+
+<title>SthaniyaConnect — Civic Intelligence Dashboard</title>
+
+
+
 <link rel="icon" href="icons/icon-192.png">
+
+
+
 <link rel="preconnect" href="https://fonts.googleapis.com">
+
+
+
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-<script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+
+
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+
+
+
 <style>
-  :root{
-    --bg:#F5F6F4; --panel:#FFFFFF; --panel-2:#EEF0ED; --line:#DBE0DB;
-    --text:#161B1D; --muted:#5B6660; --muted-2:#8B948E;
-    --amber:#C9660E; --amber-soft:#E8871E;
-    --grade-a:#2F8A75; --grade-b:#B8860B; --grade-c:#C4571E; --grade-d:#B23A3A;
-  }
-  *{box-sizing:border-box;}
-  body{margin:0;background:var(--bg);color:var(--text);font-family:'IBM Plex Sans',sans-serif;}
-  .mono{font-family:'IBM Plex Mono',monospace;}
-  header{
-    display:flex;align-items:baseline;gap:14px;padding:16px 22px;
-    border-bottom:1px solid var(--line);background:var(--panel);
-  }
-  header h1{font-size:19px;margin:0;font-weight:700;}
-  header h1 span{color:var(--amber);}
-  header p{margin:0;font-size:13px;color:var(--muted);}
-  a{color:var(--amber);text-decoration:none;font-size:13px;margin-left:auto;}
 
-  #gate{
-    max-width:360px;margin:90px auto;padding:32px;background:var(--panel);
-    border:1px solid var(--line);border-radius:6px;text-align:center;
-  }
-  #gate h2{margin:0 0 8px;font-size:18px;}
-  #gate p{margin:0 0 20px;color:var(--muted);font-size:13px;}
-  #gate input{
-    width:100%;padding:10px 12px;border:1px solid var(--line);border-radius:3px;
-    font-size:14px;margin-bottom:12px;font-family:inherit;
-  }
-  #gate button{
-    width:100%;background:var(--amber);color:#FFF6EA;border:none;padding:10px;
-    border-radius:3px;font-size:13.5px;font-weight:600;cursor:pointer;
-  }
-  #gate button:hover{background:var(--amber-soft);}
-  #gateError{color:var(--grade-d);font-size:12px;margin-top:10px;display:none;}
 
-  #panel{display:none;max-width:960px;margin:0 auto;padding:28px 22px;}
-  .warn{
-    background:#FFF3E0;border:1px solid var(--amber);color:#8A5A12;border-radius:4px;
-    padding:10px 14px;font-size:12.5px;margin-bottom:20px;
-  }
-  table{width:100%;border-collapse:collapse;background:var(--panel);border:1px solid var(--line);border-radius:6px;overflow:hidden;}
-  th, td{padding:10px 12px;text-align:left;font-size:12.5px;border-bottom:1px solid var(--line);}
-  th{background:var(--panel-2);color:var(--muted);font-weight:600;font-size:11.5px;text-transform:uppercase;letter-spacing:0.3px;}
-  tr:last-child td{border-bottom:none;}
-  .type-chip{display:inline-block;padding:2px 8px;border-radius:3px;font-size:11px;}
-  select.status-select{
-    padding:5px 8px;border:1px solid var(--line);border-radius:3px;font-size:12px;font-family:inherit;
-    background:var(--panel);
-  }
-  .flags{color:var(--grade-d);font-family:'IBM Plex Mono',monospace;font-size:11.5px;}
-  .flags.zero{color:var(--muted-2);}
-  .clear-flags{
-    background:none;border:1px solid var(--line);color:var(--muted-2);font-size:11px;
-    padding:3px 7px;border-radius:3px;cursor:pointer;margin-left:6px;
-  }
-  .empty{color:var(--muted-2);font-size:13px;padding:30px;text-align:center;}
-  #refreshBtn{
-    background:var(--panel-2);border:1px solid var(--line);color:var(--text);padding:8px 14px;
-    border-radius:3px;font-size:12.5px;cursor:pointer;margin-bottom:16px;
-  }
+
+:root{--bg:#F5F6F4;--panel:#fff;--panel2:#EEF0ED;--line:#DBE0DB;--text:#161B1D;--muted:#5B6660;--amber:#C9660E;--green:#2F8A75;--red:#B23A3A}
+
+
+
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font-family:'IBM Plex Sans',sans-serif}button,input,select,textarea{font:inherit}button{cursor:pointer}button:disabled{opacity:.55;cursor:wait}header{display:flex;align-items:center;gap:15px;padding:16px 22px;border-bottom:1px solid var(--line);background:var(--panel);flex-wrap:wrap}header h1{font-size:19px;margin:0}header h1 span{color:var(--amber)}header p{font-size:13px;color:var(--muted);margin:0}header a{margin-left:auto;color:var(--amber);font-size:13px;text-decoration:none}#gate{max-width:380px;margin:65px auto;padding:30px;background:var(--panel);border:1px solid var(--line);border-radius:7px}#gate h2{margin:0 0 7px;font-size:19px}#gate p{font-size:13px;color:var(--muted);line-height:1.5}label{font-size:12px;color:var(--muted);display:block;margin:12px 0 5px}input,select,textarea{width:100%;padding:9px 10px;border:1px solid var(--line);border-radius:4px;background:#fff;color:var(--text);font-size:13px}textarea{min-height:74px;resize:vertical}.primary{background:var(--amber);color:#fff;border:0;border-radius:4px;padding:10px 15px;font-weight:600}.secondary{background:var(--panel2);border:1px solid var(--line);border-radius:4px;padding:9px 13px;color:var(--text)}#loginBtn{width:100%;margin-top:16px}#panel{display:none;max-width:1240px;margin:auto;padding:24px 18px}.toolbar{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:17px}.toolbar h2{font-size:19px;margin:0 auto 0 0}.toolbar button{white-space:nowrap}.stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-bottom:17px}.stat{background:#fff;border:1px solid var(--line);padding:15px;border-radius:6px}.stat strong{font-size:24px;display:block}.stat span{font-size:12px;color:var(--muted)}.filters{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:15px}.filters input{flex:2;min-width:180px}.filters select{flex:1;min-width:145px}.tablewrap{overflow:auto;background:var(--panel);border:1px solid var(--line);border-radius:6px}table{border-collapse:collapse;width:100%;min-width:800px}th,td{text-align:left;border-bottom:1px solid var(--line);padding:12px;font-size:12.5px;vertical-align:top}th{background:var(--panel2);color:var(--muted);font-size:11px;text-transform:uppercase}tr:last-child td{border-bottom:0}.note{max-width:260px;overflow-wrap:anywhere;color:var(--muted)}.mono{font-family:'IBM Plex Mono',monospace}.chip{display:inline-block;border-radius:4px;background:var(--panel2);padding:4px 7px;font-size:11px}.edit{background:var(--panel2);border:1px solid var(--line);padding:6px 10px;border-radius:4px}.message{display:none;padding:11px 13px;margin:12px 0;border-radius:4px;font-size:13px;overflow-wrap:anywhere}.message.error{display:block;background:#FFF0EE;color:var(--red);border:1px solid #E8B7B0}.message.success{display:block;background:#ECF7F1;color:#206A51;border:1px solid #B8DCCB}.message.info{display:block;background:#FFF4E5;color:#83500E;border:1px solid #EBD3A5}.empty{text-align:center;padding:28px;color:var(--muted);font-size:13px}.muted{color:var(--muted)}#editor{display:none;position:fixed;inset:0;background:rgba(15,20,18,.55);z-index:20;align-items:center;justify-content:center;padding:16px}#editor.open{display:flex}.dialog{width:min(100%,490px);background:#fff;border-radius:8px;padding:23px;max-height:90vh;overflow:auto}.dialog h3{margin:0 0 7px}.dialog p{font-size:12px;color:var(--muted);overflow-wrap:anywhere}.actions{display:flex;justify-content:flex-end;gap:9px;margin-top:17px}@media(max-width:700px){.stats{grid-template-columns:repeat(2,minmax(0,1fr))}header a{margin-left:0}.toolbar h2{width:100%}}
+
+
+
+ .priority{font-weight:700;white-space:nowrap}.priority.critical{color:#B23A3A}.priority.high{color:#C9660E}.priority.medium{color:#94710A}.priority.low{color:#2F8A75}.related{font-size:11px;color:var(--muted)}.insight{margin:0 0 16px;padding:13px;background:#fff;border:1px solid var(--line);border-radius:6px;font-size:13px}.insight strong{color:var(--amber)}
+
+
+
+
+
+.analytics{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;margin:16px 0}.analytics-card{background:#fff;border:1px solid var(--line);border-radius:6px;padding:16px}.analytics-card h3{font-size:15px;margin:0 0 12px}.analytics-card p{font-size:12px;color:var(--muted)}.bar-row{display:grid;grid-template-columns:minmax(110px,1fr) 3fr 42px;align-items:center;gap:10px;margin:9px 0;font-size:12px}.bar-track{background:var(--panel2);border-radius:6px;height:10px;overflow:hidden}.bar-fill{height:100%;background:var(--amber);border-radius:6px}.suggestion{font-size:11px;color:var(--muted);margin-top:4px}.mismatch{color:var(--red);font-weight:600}.analytics-note{font-size:11px;color:var(--muted);margin-top:12px}@media(max-width:750px){.analytics{grid-template-columns:1fr}}
+
+
+/* Phase 5 — Ward Health and Municipal Performance */
+.health-head{display:flex;justify-content:space-between;gap:12px;align-items:center;flex-wrap:wrap;margin:22px 0 12px}
+.health-head h3{margin:0;font-size:18px}.health-head p{margin:5px 0 0;color:var(--muted);font-size:12px}
+.health-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-bottom:14px}
+.health-stat{background:#fff;border:1px solid var(--line);border-radius:6px;padding:16px}
+.health-stat strong{display:block;font-size:24px}.health-stat span{font-size:12px;color:var(--muted)}
+.grade{display:inline-flex;min-width:30px;justify-content:center;padding:5px 9px;border-radius:5px;font-weight:700}
+.grade-a{background:#e4f3ed;color:#206a51}.grade-b{background:#fff2ce;color:#806100}.grade-c{background:#fff0df;color:#a64e15}.grade-d{background:#ffe6e4;color:#a32727}
+.health-table{min-width:680px}.health-table td{vertical-align:middle}.health-sub{font-size:11px;color:var(--muted);margin-top:4px}
+@media(max-width:700px){.health-grid{grid-template-columns:1fr}}
 </style>
+
+
+
+<link rel="stylesheet" href="assets/theme.css">
+
 </head>
+
+
+
 <body>
 
-<header>
-  <h1>Sthaniya<span>Connect</span></h1>
-  <p>Officer view</p>
-  <a href="wardpulse.html">← Back to public map</a>
-</header>
 
-<div id="gate">
-  <h2>Officer login</h2>
-  <p>Sign in with the officer account created in Supabase.</p>
-  <input type="email" id="emailInput" placeholder="Email" autocomplete="username">
-  <input type="password" id="passwordInput" placeholder="Password" autocomplete="current-password">
-  <button id="loginBtn">Sign in</button>
-  <div id="gateError">Incorrect email or password.</div>
-</div>
 
-<div id="panel">
-  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
-    <button id="refreshBtn" style="margin-bottom:0;">↻ Refresh reports</button>
-    <button id="logoutBtn" style="background:none;border:1px solid var(--line);color:var(--muted);padding:8px 14px;border-radius:3px;font-size:12.5px;cursor:pointer;">Sign out</button>
+<header><h1>Sthaniya<span>Connect</span></h1><p>Municipal officer dashboard · Local development</p><a href="wardpulse.html">← Public map</a></header>
+
+
+
+<section id="gate"><h2>Officer login</h2><p>Sign in using the authorized officer account you created in local Supabase.</p><label for="emailInput">Email</label><input type="email" id="emailInput" autocomplete="username" placeholder="officer@example.com"><label for="passwordInput">Password</label><input type="password" id="passwordInput" autocomplete="current-password" placeholder="Password"><button class="primary" id="loginBtn">Sign in</button><div id="gateMessage" class="message" role="alert"></div></section>
+
+
+
+<main id="panel"><div class="toolbar"><h2>Complaint management</h2><span id="officerName" class="muted"></span><button class="secondary" id="refreshBtn">↻ Refresh</button><button class="secondary" id="logoutBtn">Sign out</button></div><div id="panelMessage" class="message" role="status"></div><div class="stats"><div class="stat"><strong id="totalCount">0</strong><span>Total</span></div><div class="stat"><strong id="openCount">0</strong><span>Open</span></div><div class="stat"><strong id="ackCount">0</strong><span>Acknowledged</span></div><div class="stat"><strong id="resolvedCount">0</strong><span>Resolved</span></div></div><div class="insight" id="insightSummary">Priority and potential duplicate analysis will appear here.</div><section class="analytics" aria-label="Civic hotspot analytics"><div class="analytics-card"><h3>Locality hotspots</h3><div id="hotspotRows"></div><p>Unresolved complaints by locality, based on the loaded reports.</p></div><div class="analytics-card"><h3>Issue distribution</h3><div id="categoryRows"></div><p>All loaded complaints by their submitted category.</p></div><div class="analytics-card"><h3>Monthly complaint trends</h3><div id="trendRows"></div><p>Monthly reports, including resolved complaints.</p></div><div class="analytics-card"><h3>Suggested category review</h3><div id="suggestionRows"></div><p>Keyword-based suggestions only; officer confirmation is required.</p></div></section>
+<section id="wardHealth" aria-label="Ward health scores and municipal performance">
+  <div class="health-head"><div><h3>Ward Health &amp; Municipal Performance</h3><p>30-day complaint-based reliability grades. A: 0–2 · B: 3–5 · C: 6–9 · D: 10+ reports.</p></div></div>
+  <div class="health-grid">
+    <div class="health-stat"><strong id="healthLocalities">0</strong><span>Localities represented</span></div>
+    <div class="health-stat"><strong id="healthResolution">—</strong><span>Resolution rate (loaded reports)</span></div>
+    <div class="health-stat"><strong id="healthUnresolved">0</strong><span>Unresolved complaints</span></div>
   </div>
-  <table>
-    <thead>
-      <tr><th>Type</th><th>Locality</th><th>Note</th><th>Reported</th><th>Flags</th><th>Status</th></tr>
-    </thead>
-    <tbody id="rows"></tbody>
-  </table>
-  <div id="emptyState" class="empty" style="display:none;">No reports found — check your Supabase keys are filled in below.</div>
-</div>
+  <div class="tablewrap"><table class="health-table"><thead><tr><th>Locality</th><th>30-day reports</th><th>Health grade</th><th>Total reports</th><th>Unresolved</th><th>Resolved</th><th>Resolution rate</th></tr></thead><tbody id="healthRows"></tbody></table><div id="healthEmpty" class="empty" hidden>No locality data available.</div></div>
+  <p class="analytics-note">Grades measure reported incident volume, not independently verified infrastructure reliability. Scores are based on the latest 1,000 loaded reports; results may be incomplete if more exist. Localities without reports cannot be graded from this dataset.</p>
+</section>
+<div class="filters"><input id="searchInput" type="text" placeholder="Search locality, type, or note"><select id="statusFilter"><option value="">All statuses</option><option value="open">Open</option><option value="acknowledged">Acknowledged</option><option value="resolved">Resolved</option></select></div><div class="tablewrap"><table><thead><tr><th>Type</th><th>Locality</th><th>Citizen note</th><th>Reported</th><th>Status</th><th>Severity</th><th>Priority</th><th>Related reports</th><th>Category suggestion</th><th>Assigned to</th><th>Action</th></tr></thead><tbody id="rows"></tbody></table><div id="emptyState" class="empty" hidden>No matching reports.</div></div></main>
+
+
+
+<div id="editor" role="dialog" aria-modal="true" aria-labelledby="editorTitle"><div class="dialog"><h3 id="editorTitle">Manage complaint</h3><p id="editorInfo"></p><p id="editorInsights"></p><label for="editStatus">Status</label><select id="editStatus"><option value="open">Open</option><option value="acknowledged">Acknowledged</option><option value="resolved">Resolved</option></select><label for="editSeverity">Severity (1–5)</label><select id="editSeverity"><option value="">Not set</option><option value="1">1 — Low</option><option value="2">2</option><option value="3">3 — Medium</option><option value="4">4</option><option value="5">5 — Critical</option></select><label for="editAssigned">Assigned officer / team ID (UUID)</label><input id="editAssigned" placeholder="Leave empty to unassign"><p>Assignments use an officer's UUID, not their name. The database may require an existing officer ID.</p><label for="editNote">Officer note</label><textarea id="editNote" maxlength="3000" placeholder="Actions taken or next steps"></textarea><div id="editMessage" class="message" role="alert"></div><div class="actions"><button class="secondary" id="cancelBtn">Cancel</button><button class="primary" id="saveBtn">Save changes</button></div></div></div>
+
+
 
 <script>
-(function(){
-  // Must match the same project as wardpulse.html.
- const SUPABASE_URL = 'https://hdydeuldzdxrpknzlgam.supabase.co';
- const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhkeWRldWxkemR4cnBrbnpsZ2FtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODk0OTM4NzIsImV4cCI6MjEwNTA2OTg3Mn0.J36HJ-2LYgX-AVLI3Y428aT3h6REI7zQyRV-aWZrA-s';  // the long 'anon public' key
 
-  const TYPE_COLORS = {power:'#C9660E', water:'#3E6E96', light:'#6E5AA6', other:'#7A837D'};
-  const TYPE_LABELS = {power:'Power cut', water:'Water leak', light:'Streetlight', other:'Other'};
 
-  const supa = (SUPABASE_URL && SUPABASE_ANON_KEY) ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
 
-  function escapeHtml(s){
-    return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+(function () {
+
+
+
+  'use strict';
+
+
+
+  // LOCAL DEVELOPMENT ONLY: never put a service-role/secret key in this file.
+
+
+
+  const SUPABASE_URL = 'https://hdydeuldzdxrpknzlgam.supabase.co';
+  const SUPABASE_ANON_KEY = 'sb_publishable_pv5paA7-inUhLU6MFC0zxw_RJj9XbbS';
+
+
+  const client = window.supabase && window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+
+
+  const TYPES = {power:'Power cut',water:'Water leak',light:'Streetlight',other:'Other'};
+
+
+
+  const VALID_STATUSES = ['open','acknowledged','resolved'];
+
+
+
+  let allReports = [];
+
+
+
+  let currentReport = null;
+
+
+
+  // Transparent, browser-side recommendations; no database or RLS changes.
+
+
+
+  const MAX_DISTANCE_KM = 0.5;
+
+
+
+  const MAX_TIME_MS = 7 * 86400000;
+
+
+
+  function validCoords(r) {
+
+
+
+    if(r.lat === null || r.lat === undefined || r.lng === null || r.lng === undefined || r.lat === '' || r.lng === '') return false;
+
+
+
+    const a=Number(r.lat), b=Number(r.lng);
+
+
+
+    return Number.isFinite(a)&&Number.isFinite(b)&&Math.abs(a)<=90&&Math.abs(b)<=180;
+
+
+
   }
 
-  function fmtDate(ts){
-    return new Date(Number(ts)).toLocaleDateString('en-IN', {day:'numeric', month:'short', year:'numeric'});
+
+
+  function distanceKm(a,b) {
+
+
+
+    if(!validCoords(a)||!validCoords(b)) return Infinity;
+
+
+
+    const rad=Math.PI/180, p1=Number(a.lat)*rad, p2=Number(b.lat)*rad;
+
+
+
+    const dp=p2-p1, dl=(Number(b.lng)-Number(a.lng))*rad;
+
+
+
+    const h=Math.sin(dp/2)**2+Math.cos(p1)*Math.cos(p2)*Math.sin(dl/2)**2;
+
+
+
+    return 6371*2*Math.asin(Math.min(1,Math.sqrt(h)));
+
+
+
   }
 
-  async function loadRows(){
-    const tbody = document.getElementById('rows');
-    const empty = document.getElementById('emptyState');
-    if(!supa){
-      empty.style.display = 'block';
-      tbody.innerHTML = '';
-      return;
-    }
-    const { data, error } = await supa.from('reports').select('*').order('ts', {ascending:false});
-    if(error || !data || data.length === 0){
-      empty.style.display = 'block';
-      tbody.innerHTML = '';
-      return;
-    }
-    empty.style.display = 'none';
-    tbody.innerHTML = data.map(r => `
-      <tr>
-        <td><span class="type-chip" style="background:${TYPE_COLORS[r.type]}22;color:${TYPE_COLORS[r.type]}">${TYPE_LABELS[r.type]||r.type}</span></td>
-        <td>${escapeHtml(r.locality)}</td>
-        <td style="max-width:220px;color:var(--muted)">${escapeHtml(r.note||'—')}</td>
-        <td class="mono">${fmtDate(r.ts)}</td>
-        <td>
-          <span class="flags ${!r.flags ? 'zero' : ''}">${r.flags||0}</span>
-          ${r.flags ? `<button class="clear-flags" data-id="${r.id}">clear</button>` : ''}
-        </td>
-        <td>
-          <select class="status-select" data-id="${r.id}">
-            <option value="open" ${r.status==='open'||!r.status?'selected':''}>Open</option>
-            <option value="acknowledged" ${r.status==='acknowledged'?'selected':''}>Acknowledged</option>
-            <option value="resolved" ${r.status==='resolved'?'selected':''}>Resolved</option>
-          </select>
-        </td>
-      </tr>
-    `).join('');
 
-    tbody.querySelectorAll('.status-select').forEach(sel => {
-      sel.addEventListener('change', async () => {
-        await supa.from('reports').update({status: sel.value}).eq('id', sel.dataset.id);
-      });
+
+  function timeMs(r) {
+
+
+
+    if(r.ts===null||r.ts===undefined||r.ts==='')return NaN;
+
+
+
+    const n=Number(r.ts);
+
+
+
+    if(Number.isFinite(n))return n<1e11?n*1000:n;
+
+
+
+    return Date.parse(r.ts);
+
+
+
+  }
+
+
+
+  function related(a,b) {
+
+
+
+    if((a.status||'open')==='resolved'||(b.status||'open')==='resolved')return false;
+
+
+
+    if(String(a.type||'').toLowerCase()!==String(b.type||'').toLowerCase())return false;
+
+
+
+    const ta=timeMs(a),tb=timeMs(b);
+
+
+
+    return Number.isFinite(ta)&&Number.isFinite(tb)&&Math.abs(ta-tb)<=MAX_TIME_MS&&distanceKm(a,b)<=MAX_DISTANCE_KM;
+
+
+
+  }
+
+
+
+  function analyze(reports) {
+
+
+
+    const active=reports.filter(r=>(r.status||'open')!=='resolved').slice().sort((a,b)=>timeMs(a)-timeMs(b));
+
+
+
+    const groups=[];
+
+
+
+    // All members must be close to every other member: avoids chain-linked neighbourhoods.
+
+
+
+    for(const r of active){
+
+
+
+      const group=groups.find(g=>g.every(other=>related(r,other)));
+
+
+
+      if(group)group.push(r);else groups.push([r]);
+
+
+
+    }
+
+
+
+    const lookup=new Map();
+
+
+
+    groups.forEach((g,i)=>g.forEach(r=>lookup.set(String(r.id),{count:g.length,group:i+1})));
+
+
+
+    const now=Date.now();
+
+
+
+    return reports.map(r=>{
+
+
+
+      const match=lookup.get(String(r.id))||{count:1,group:null};
+
+
+
+      if((r.status||'open')==='resolved')return {...r,duplicateCount:0,duplicateGroup:null,priority:{score:0,level:'Resolved',reasons:['Resolved complaint']}};
+
+
+
+      const raw=Number(r.severity),sev=Number.isInteger(raw)&&raw>=1&&raw<=5?raw:1;
+
+
+
+      const age=Number.isFinite(timeMs(r))?Math.max(0,Math.floor((now-timeMs(r))/86400000)):0;
+
+
+
+      const sevPoints=sev*10,agePoints=Math.min(20,age*2),duplicatePoints=Math.min(25,(match.count-1)*5);
+
+
+
+      const statusPoints=(r.status||'open')==='open'?5:0;
+
+
+
+      const score=Math.min(100,sevPoints+agePoints+duplicatePoints+statusPoints);
+
+
+
+      const level=score>=75?'Critical':score>=50?'High':score>=25?'Medium':'Low';
+
+
+
+      return {...r,duplicateCount:match.count,duplicateGroup:match.count>1?match.group:null,priority:{score,level,reasons:[`Severity ${sev}/5 (+${sevPoints})`,`Age ${age} days (+${agePoints})`,`Related reports ${match.count} (+${duplicatePoints})`,`Status ${r.status||'open'} (+${statusPoints})`]}};
+
+
+
+    }).sort((a,b)=>b.priority.score-a.priority.score||timeMs(a)-timeMs(b));
+
+
+
+  }
+
+
+
+  // Keyword-based category suggestions. Never overwrite citizen reports automatically.
+
+  const CATEGORY_RULES = {
+
+    power: [/\b(power|electricity|electric|transformer|blackout|voltage|mseb|msedcl|light cut|bijli|वीज|बिजली)\b/iu],
+
+    water: [/\b(water|pipeline|pipe burst|leak|leakage|tap|supply|paani|pani|पाणी|पानी|जलवाहिनी)\b/iu],
+
+    light: [/\b(streetlight|street light|lamp post|lamppost|street lamp|pole light|रस्त्यावरील दिवे)\b/iu]
+
+  };
+
+  function suggestCategory(r) {
+
+    const note = String(r.note || '').toLowerCase();
+
+    const scores = Object.fromEntries(Object.keys(CATEGORY_RULES).map(k => [k, 0]));
+
+    for (const [category, patterns] of Object.entries(CATEGORY_RULES)) {
+
+      for (const pattern of patterns) if (pattern.test(note)) scores[category]++;
+
+    }
+
+    const top = Object.entries(scores).sort((a,b)=>b[1]-a[1]);
+
+    if (!top[0] || top[0][1] === 0 || (top[1] && top[1][1] === top[0][1])) return {category:null, mismatch:false};
+
+    const category=top[0][0];
+
+    return {category,mismatch:category !== String(r.type || '').toLowerCase()};
+
+  }
+
+  function bars(target, items, emptyText) {
+
+    const root=el(target);root.replaceChildren();
+
+    if (!items.length) {const p=document.createElement('p');p.textContent=emptyText;root.append(p);return;}
+
+    const max=Math.max(...items.map(x=>x[1]),1);
+
+    items.forEach(([name,count])=>{
+
+      const row=document.createElement('div');row.className='bar-row';
+
+      const label=document.createElement('span');label.textContent=name;label.title=name;
+
+      const track=document.createElement('div');track.className='bar-track';
+
+      const fill=document.createElement('div');fill.className='bar-fill';fill.style.width=(100*count/max)+'%';track.append(fill);
+
+      const value=document.createElement('strong');value.textContent=String(count);
+
+      row.append(label,track,value);root.append(row);
+
     });
-    tbody.querySelectorAll('.clear-flags').forEach(btn => {
-      btn.addEventListener('click', async () => {
-        await supa.from('reports').update({flags: 0}).eq('id', btn.dataset.id);
-        loadRows();
-      });
-    });
+
   }
 
-  document.getElementById('loginBtn').addEventListener('click', async () => {
-    if(!supa){ document.getElementById('gateError').textContent = 'Supabase keys not set in this page yet.'; document.getElementById('gateError').style.display = 'block'; return; }
-    const email = document.getElementById('emailInput').value.trim();
-    const password = document.getElementById('passwordInput').value;
-    const { error } = await supa.auth.signInWithPassword({ email, password });
-    if(error){
-      document.getElementById('gateError').textContent = error.message;
-      document.getElementById('gateError').style.display = 'block';
-    } else {
-      document.getElementById('gate').style.display = 'none';
-      document.getElementById('panel').style.display = 'block';
-      loadRows();
-    }
-  });
-  document.getElementById('passwordInput').addEventListener('keydown', (e) => {
-    if(e.key === 'Enter') document.getElementById('loginBtn').click();
-  });
-  document.getElementById('logoutBtn').addEventListener('click', async () => {
-    if(supa) await supa.auth.signOut();
-    document.getElementById('panel').style.display = 'none';
-    document.getElementById('gate').style.display = 'block';
-    document.getElementById('emailInput').value = '';
-    document.getElementById('passwordInput').value = '';
-  });
-  document.getElementById('refreshBtn').addEventListener('click', loadRows);
+  function tally(items, key) {
 
-  // If there's already a valid signed-in session (e.g. page refresh), skip the login screen.
-  (async () => {
-    if(!supa) return;
-    const { data } = await supa.auth.getSession();
-    if(data && data.session){
-      document.getElementById('gate').style.display = 'none';
-      document.getElementById('panel').style.display = 'block';
-      loadRows();
+    const counts=new Map();
+
+    items.forEach(item=>{const name=key(item);if(name)counts.set(name,(counts.get(name)||0)+1);});
+
+    return [...counts].sort((a,b)=>b[1]-a[1]||a[0].localeCompare(b[0]));
+
+  }
+
+
+  function renderWardHealth() {
+    const now = Date.now();
+    const cutoff = now - 30 * 86400000;
+    const localities = new Map();
+    let unresolvedTotal = 0;
+    let resolvedTotal = 0;
+    for (const report of allReports) {
+      const name = String(report.locality || 'Unknown').trim() || 'Unknown';
+      const key = name.toLocaleLowerCase('en-IN');
+      if (!localities.has(key)) localities.set(key, { name, total: 0, recent: 0, resolved: 0, unresolved: 0 });
+      const item = localities.get(key);
+      item.total++;
+      const stamp = timeMs(report);
+      if (Number.isFinite(stamp) && stamp >= cutoff && stamp <= now) item.recent++;
+      if (report.status === 'resolved') { item.resolved++; resolvedTotal++; }
+      else { item.unresolved++; unresolvedTotal++; }
     }
-  })();
+    el('healthLocalities').textContent = String(localities.size);
+    el('healthUnresolved').textContent = String(unresolvedTotal);
+    el('healthResolution').textContent = allReports.length ? (100 * resolvedTotal / allReports.length).toFixed(1) + '%' : '—';
+    const sorted = [...localities.values()].sort((a, b) => b.recent - a.recent || b.unresolved - a.unresolved || a.name.localeCompare(b.name));
+    el('healthRows').innerHTML = sorted.map(item => {
+      const grade = item.recent <= 2 ? 'A' : item.recent <= 5 ? 'B' : item.recent <= 9 ? 'C' : 'D';
+      const rate = (100 * item.resolved / item.total).toFixed(1) + '%';
+      return '<tr><td><strong>' + escapeHtml(item.name) + '</strong></td>' +
+        '<td class="mono">' + item.recent + '</td>' +
+        '<td><span class="grade grade-' + grade.toLowerCase() + '">' + grade + '</span></td>' +
+        '<td>' + item.total + '</td><td>' + item.unresolved + '</td><td>' + item.resolved + '</td><td>' + rate + '</td></tr>';
+    }).join('');
+    el('healthEmpty').hidden = sorted.length > 0;
+  }
+
+  function renderAnalytics() {
+
+    const unresolved=allReports.filter(r=>(r.status||'open')!=='resolved');
+
+    bars('hotspotRows',tally(unresolved,r=>String(r.locality||'Unknown').trim()).slice(0,8),'No unresolved reports.');
+
+    bars('categoryRows',tally(allReports,r=>TYPES[r.type]||r.type||'Other'),'No reports.');
+
+    bars('trendRows',tally(allReports,r=>{const t=timeMs(r);return Number.isFinite(t)?new Date(t).toISOString().slice(0,7):null;}).sort((a,b)=>a[0].localeCompare(b[0])).slice(-6),'No dated reports.');
+
+    const mismatches=allReports.filter(r=>r.categorySuggestion.mismatch);
+
+    bars('suggestionRows',tally(mismatches,r=>TYPES[r.categorySuggestion.category]||r.categorySuggestion.category).slice(0,5),'No category mismatches suggested.');
+
+  }
+
+
+
+  const el = id => document.getElementById(id);
+
+
+
+  const show = (id, msg, kind='error') => {const e=el(id);e.textContent=msg;e.className='message '+kind;};
+
+
+
+  const hide = id => {const e=el(id);e.textContent='';e.className='message';};
+
+
+
+  const escapeHtml = s => String(s ?? '').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+
+
+
+  const fmtDate = ts => {const t=timeMs({ts});const d=new Date(t);return Number.isNaN(d.getTime())?'—':d.toLocaleString('en-IN',{day:'numeric',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'});};
+
+
+
+  const setSignedOut = () => {el('panel').style.display='none';el('gate').style.display='block';el('editor').classList.remove('open');el('passwordInput').value='';allReports=[];};
+
+
+
+  const setSignedIn = name => {el('gate').style.display='none';el('panel').style.display='block';el('officerName').textContent=name;hide('gateMessage');};
+
+
+
+  async function checkOfficer() {
+
+
+
+    const {data:{user},error:authError}=await client.auth.getUser();
+
+
+
+    if(authError || !user) throw new Error('Please sign in again.');
+
+
+
+    const {data,error}=await client.from('officers').select('display_name,role,active').eq('user_id',user.id).maybeSingle();
+
+
+
+    if(error) throw new Error('Cannot verify officer access: '+error.message+'. Check the officers SELECT policy.');
+
+
+
+    if(!data || !data.active) throw new Error('This account is not an active authorized officer.');
+
+
+
+    return data.display_name || user.email || 'Officer';
+
+
+
+  }
+
+
+
+  async function enterDashboard() {
+
+
+
+    try {const name=await checkOfficer();setSignedIn(name);await loadRows();}
+
+
+
+    catch(e){setSignedOut();show('gateMessage',e.message);}
+
+
+
+  }
+
+
+
+  async function loadRows() {
+
+
+
+    hide('panelMessage');
+
+
+
+    el('refreshBtn').disabled=true;
+
+
+
+    try {
+
+
+
+      const {data,error}=await client.from('reports').select('id,type,locality,note,lat,lng,ts,status,severity,assigned_to,officer_note,flags').order('ts',{ascending:false}).limit(1000);
+
+
+
+      if(error) throw error;
+
+
+
+      allReports=analyze(data || []).map(r=>({...r,categorySuggestion:suggestCategory(r)}));
+
+        renderAnalytics();
+        renderWardHealth();
+
+
+
+      const grouped=new Set(allReports.filter(r=>r.duplicateGroup!==null).map(r=>r.duplicateGroup));
+
+
+
+      const urgent=allReports.filter(r=>r.priority.level==='Critical'||r.priority.level==='High').length;
+
+
+
+      el('insightSummary').textContent=`${grouped.size} potential duplicate groups · ${urgent} high/critical priority complaints · Scores are recommendations, not verified incidents. Analysis covers the latest 1,000 reports.`;
+
+
+
+      el('totalCount').textContent=allReports.length;
+
+
+
+      el('openCount').textContent=allReports.filter(r=>(r.status||'open')==='open').length;
+
+
+
+      el('ackCount').textContent=allReports.filter(r=>r.status==='acknowledged').length;
+
+
+
+      el('resolvedCount').textContent=allReports.filter(r=>r.status==='resolved').length;
+
+
+
+      renderRows();
+
+
+
+    } catch(e){allReports=[];renderRows();renderAnalytics();renderWardHealth();show('panelMessage','Could not load reports: '+e.message);}
+
+
+
+    finally {el('refreshBtn').disabled=false;}
+
+
+
+  }
+
+
+
+  function renderRows() {
+
+
+
+    const term=el('searchInput').value.trim().toLowerCase();
+
+
+
+    const status=el('statusFilter').value;
+
+
+
+    const filtered=allReports.filter(r=>(!status||(r.status||'open')===status)&&(!term||[r.locality,r.note,r.type,r.officer_note].some(v=>String(v||'').toLowerCase().includes(term))));
+
+
+
+    el('rows').innerHTML=filtered.map(r=>{
+
+      const priority='<span class="priority '+escapeHtml(r.priority.level.toLowerCase())+'">'+r.priority.score+'/100 · '+escapeHtml(r.priority.level)+'</span>';
+
+      const related=r.duplicateCount>1?escapeHtml(r.duplicateCount+' potential · Group '+r.duplicateGroup):'Unique';
+
+      const suggested=r.categorySuggestion.category?(escapeHtml(TYPES[r.categorySuggestion.category]||r.categorySuggestion.category)+(r.categorySuggestion.mismatch?'<div class="suggestion mismatch">Review mismatch</div>':'<div class="suggestion">Matches</div>')):'<span class="muted">No clear suggestion</span>';
+
+      return '<tr><td><span class="chip">'+escapeHtml(TYPES[r.type]||r.type)+'</span></td><td>'+escapeHtml(r.locality)+'</td><td class="note">'+escapeHtml(r.note||'—')+'</td><td class="mono">'+fmtDate(r.ts)+'</td><td>'+escapeHtml(r.status||'open')+'</td><td>'+escapeHtml(r.severity??'—')+'</td><td>'+priority+'</td><td>'+related+'</td><td>'+suggested+'</td><td class="note">'+escapeHtml(r.assigned_to||'—')+'</td><td><button class="edit" data-id="'+escapeHtml(r.id)+'">Manage</button></td></tr>';
+
+    }).join('');
+
+
+
+    el('emptyState').hidden=filtered.length!==0;
+
+
+
+  }
+
+
+
+  function openEditor(id) {
+
+
+
+    const r=allReports.find(x=>String(x.id)===String(id));if(!r)return;
+
+
+
+    currentReport=r;
+
+
+
+    el('editorInfo').textContent=(TYPES[r.type]||r.type)+' · '+r.locality+' · '+fmtDate(r.ts);
+
+
+
+    el('editorInsights').textContent='Priority '+r.priority.score+'/100 ('+r.priority.level+'). '+r.priority.reasons.join('; ')+'. '+(r.duplicateCount>1?r.duplicateCount+' potential related reports in group '+r.duplicateGroup+'.':'No potential duplicates detected.')+' Category suggestion: '+(r.categorySuggestion.category?(TYPES[r.categorySuggestion.category]||r.categorySuggestion.category)+(r.categorySuggestion.mismatch?' (review mismatch)':' (matches submitted type)'):'No clear suggestion')+'.';
+
+
+
+    el('editStatus').value=VALID_STATUSES.includes(r.status)?r.status:'open';
+
+
+
+    el('editSeverity').value=r.severity==null?'':String(r.severity);
+
+
+
+    el('editAssigned').value=r.assigned_to||'';
+
+
+
+    el('editNote').value=r.officer_note||'';
+
+
+
+    hide('editMessage');el('editor').classList.add('open');el('editStatus').focus();
+
+
+
+  }
+
+
+
+  async function saveChanges() {
+
+
+
+    if(!currentReport)return;
+
+
+
+    const status=el('editStatus').value;
+
+
+
+    const severity=el('editSeverity').value;
+
+
+
+    const assigned=el('editAssigned').value.trim();
+
+
+
+    if(!VALID_STATUSES.includes(status)){show('editMessage','Invalid status.');return;}
+
+
+
+    if(assigned&&!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(assigned)){show('editMessage','Assigned officer/team ID must be a valid UUID, or empty.');return;}
+
+
+
+    const payload={status,severity:severity===''?null:Number(severity),assigned_to:assigned||null,officer_note:el('editNote').value.trim()||null};
+
+
+
+    el('saveBtn').disabled=true;hide('editMessage');
+
+
+
+    try {
+
+
+
+      const {data,error}=await client.from('reports').update(payload).eq('id',currentReport.id).select('id');
+
+
+
+      if(error)throw error;
+
+
+
+      if(!data||data.length===0)throw new Error('No row was updated. Verify the officer UPDATE policy and report permissions.');
+
+
+
+      el('editor').classList.remove('open');currentReport=null;
+
+
+
+      await loadRows();show('panelMessage','Complaint updated successfully.','success');
+
+
+
+    } catch(e){show('editMessage','Could not save: '+e.message);}
+
+
+
+    finally {el('saveBtn').disabled=false;}
+
+
+
+  }
+
+
+
+  el('loginBtn').addEventListener('click',async()=>{
+
+
+
+    if(!client){show('gateMessage','Supabase library did not load. Check your internet connection.');return;}
+
+
+
+    const email=el('emailInput').value.trim(),password=el('passwordInput').value;
+
+
+
+    if(!email||!password){show('gateMessage','Enter your email and password.');return;}
+
+
+
+    el('loginBtn').disabled=true;hide('gateMessage');
+
+
+
+    try {const {error}=await client.auth.signInWithPassword({email,password});if(error)throw error;await enterDashboard();}
+
+
+
+    catch(e){show('gateMessage',e.message);}
+
+
+
+    finally {el('loginBtn').disabled=false;}
+
+
+
+  });
+
+
+
+  el('passwordInput').addEventListener('keydown',e=>{if(e.key==='Enter')el('loginBtn').click();});
+
+
+
+  el('logoutBtn').addEventListener('click',async()=>{await client.auth.signOut();setSignedOut();});
+
+
+
+  el('refreshBtn').addEventListener('click',loadRows);
+
+
+
+  el('searchInput').addEventListener('input',renderRows);
+
+
+
+  el('statusFilter').addEventListener('change',renderRows);
+
+
+
+  el('rows').addEventListener('click',e=>{const btn=e.target.closest('button[data-id]');if(btn)openEditor(btn.dataset.id);});
+
+
+
+  el('cancelBtn').addEventListener('click',()=>{el('editor').classList.remove('open');currentReport=null;});
+
+
+
+  el('saveBtn').addEventListener('click',saveChanges);
+
+
+
+  el('editor').addEventListener('click',e=>{if(e.target===el('editor'))el('cancelBtn').click();});
+
+
+
+  document.addEventListener('keydown',e=>{if(e.key==='Escape'&&el('editor').classList.contains('open'))el('cancelBtn').click();});
+
+
+
+  (async()=>{if(!client){show('gateMessage','Supabase library did not load.');return;}const {data:{session}}=await client.auth.getSession();if(session)await enterDashboard();})();
+
+
+
 })();
+
+
+
 </script>
+
+
+
 </body>
+
+
+
 </html>

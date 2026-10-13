@@ -1,0 +1,669 @@
+
+/* STHANIYACONNECT — PHASE 6 DESIGN SYSTEM */
+/* Cherry Rose + Cream | Editorial Civic-Tech */
+
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@400;500;600;700&display=swap');
+
+:root {
+  --bg: #FFFCF1;
+  --panel: #FFFDF7;
+  --panel2: #FFF5E6;
+  --panel-2: #FFF5E6;
+  --line: #E9D9D5;
+  --text: #4C2030;
+  --muted: #856977;
+  --muted-2: #A88A95;
+
+  --amber: #DF3363;
+  --amber-soft: #DF5A89;
+
+  --green: #35836F;
+  --red: #A32B48;
+
+  --grade-a: #35836F;
+  --grade-b: #A68132;
+  --grade-c: #C36A47;
+  --grade-d: #B73855;
+
+  --type-power: #DF3363;
+  --type-water: #5C8DAD;
+  --type-light: #A16B9E;
+
+  --cherry: #DF3363;
+  --rose: #DF5A89;
+  --cream: #FEFED0;
+  --champagne: #EFE2B0;
+  --burgundy: #641D36;
+
+  --font-heading: 'Playfair Display', Georgia, serif;
+  --font-body: 'DM Sans', Arial, sans-serif;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background: var(--bg) !important;
+  color: var(--text) !important;
+  font-family: var(--font-body) !important;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-heading) !important;
+  font-weight: 600;
+  letter-spacing: -0.025em;
+  color: var(--burgundy);
+}
+
+p {
+  line-height: 1.65;
+}
+
+a {
+  transition: color .2s ease, opacity .2s ease;
+}
+
+a:hover {
+  color: var(--cherry);
+}
+
+header {
+  background: rgba(255,253,247,.94) !important;
+  border-bottom: 1px solid var(--line) !important;
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+}
+
+header h1,
+header h1 span {
+  font-family: var(--font-heading) !important;
+}
+
+header h1 span {
+  color: var(--cherry) !important;
+}
+
+header a {
+  color: var(--cherry) !important;
+}
+
+button,
+input,
+select,
+textarea {
+  font-family: var(--font-body) !important;
+}
+
+input,
+select,
+textarea {
+  background: #FFFEFB !important;
+  border: 1px solid #E8D7D7 !important;
+  border-radius: 10px !important;
+  color: var(--text) !important;
+  transition: border-color .2s ease, box-shadow .2s ease;
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+  outline: none !important;
+  border-color: var(--rose) !important;
+  box-shadow: 0 0 0 3px rgba(223,90,137,.12) !important;
+}
+
+input::placeholder,
+textarea::placeholder {
+  color: #AA9199;
+}
+
+button {
+  transition:
+    transform .2s ease,
+    box-shadow .2s ease,
+    background .2s ease;
+}
+
+button:not(:disabled):hover {
+  transform: translateY(-1px);
+}
+
+button:focus-visible,
+a:focus-visible {
+  outline: 3px solid var(--rose);
+  outline-offset: 3px;
+}
+
+.primary,
+button.primary {
+  background: var(--cherry) !important;
+  color: white !important;
+  border: 1px solid var(--cherry) !important;
+  border-radius: 10px !important;
+  box-shadow: 0 4px 14px rgba(223,51,99,.13);
+}
+
+.primary:not(:disabled):hover {
+  background: #BF2450 !important;
+  box-shadow: 0 8px 22px rgba(223,51,99,.2);
+}
+
+.secondary,
+button.secondary,
+.edit {
+  background: #FFF7F2 !important;
+  color: var(--burgundy) !important;
+  border: 1px solid #EAD5D4 !important;
+  border-radius: 9px !important;
+}
+
+.secondary:not(:disabled):hover,
+.edit:not(:disabled):hover {
+  background: #FFE8EB !important;
+}
+
+#panel {
+  max-width: 1300px;
+}
+
+#gate,
+.stat,
+.analytics-card,
+.insight,
+.tablewrap {
+  background: var(--panel) !important;
+  border: 1px solid var(--line) !important;
+  border-radius: 15px !important;
+  box-shadow: 0 5px 25px rgba(100,29,54,.035);
+}
+
+#gate {
+  box-shadow: 0 18px 55px rgba(100,29,54,.08);
+}
+
+.stat {
+  padding: 20px !important;
+}
+
+.stat strong {
+  color: var(--burgundy);
+  font-family: var(--font-heading);
+  font-size: 30px !important;
+}
+
+.stat span,
+.muted,
+.analytics-note {
+  color: var(--muted) !important;
+}
+
+.analytics-card {
+  padding: 20px !important;
+}
+
+.analytics-card h3 {
+  font-size: 19px !important;
+}
+
+.insight {
+  border-left: 4px solid var(--cherry) !important;
+}
+
+.insight strong {
+  color: var(--cherry) !important;
+}
+
+.bar-track {
+  background: #F5E6E5 !important;
+  border-radius: 20px !important;
+}
+
+.bar-fill {
+  background: linear-gradient(90deg, var(--rose), var(--cherry)) !important;
+  border-radius: 20px !important;
+}
+
+table {
+  background: var(--panel);
+}
+
+th {
+  background: #FAEDEA !important;
+  color: var(--burgundy) !important;
+  font-weight: 700 !important;
+  letter-spacing: .045em;
+}
+
+td {
+  color: var(--text);
+}
+
+th, td {
+  border-bottom-color: var(--line) !important;
+}
+
+tbody tr {
+  transition: background .18s ease;
+}
+
+tbody tr:hover {
+  background: #FFF6F5;
+}
+
+.chip {
+  background: #FBE7EC !important;
+  color: var(--burgundy) !important;
+  border-radius: 7px !important;
+}
+
+.priority.high,
+.priority.critical,
+.mismatch {
+  color: #B73855 !important;
+}
+
+.priority.medium {
+  color: #A36B34 !important;
+}
+
+.priority.low {
+  color: #35836F !important;
+}
+
+.dialog {
+  background: #FFFDF7 !important;
+  border: 1px solid var(--line);
+  border-radius: 18px !important;
+  box-shadow: 0 24px 75px rgba(55,15,29,.18);
+}
+
+#editor {
+  backdrop-filter: blur(5px);
+}
+
+.message.success {
+  background: #EDF7F0 !important;
+}
+
+.message.error {
+  background: #FFF0F2 !important;
+}
+
+.message.info {
+  background: #FFF4E5 !important;
+}
+
+/* Public website and map styling */
+
+#map,
+.leaflet-container {
+  border-radius: 12px;
+  font-family: var(--font-body) !important;
+}
+
+.leaflet-popup-content-wrapper {
+  border-radius: 13px !important;
+  box-shadow: 0 12px 35px rgba(70,25,40,.12) !important;
+}
+
+.leaflet-popup-content {
+  color: var(--burgundy);
+}
+
+.leaflet-control-zoom a {
+  color: var(--burgundy) !important;
+}
+
+.leaflet-container img {
+  max-width: none !important;
+}
+
+/* Subtle polish without affecting layout or functionality */
+
+.stat,
+.analytics-card,
+#gate {
+  transition: box-shadow .25s ease, border-color .25s ease;
+}
+
+.stat:hover,
+.analytics-card:hover {
+  border-color: #E8BAC8 !important;
+  box-shadow: 0 9px 28px rgba(100,29,54,.065);
+}
+
+::selection {
+  background: #F5B8CB;
+  color: var(--burgundy);
+}
+
+@media (max-width: 750px) {
+  .stat,
+  .analytics-card {
+    padding: 15px !important;
+  }
+
+  .stat strong {
+    font-size: 25px !important;
+  }
+
+  header {
+    backdrop-filter: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    transition-duration: .01ms !important;
+    animation-duration: .01ms !important;
+  }
+}
+
+/* PHASE 6 — LANDING PAGE CONTRAST FIX */
+
+/* Make primary pink buttons readable */
+a.primary,
+button.primary,
+.primary,
+a.btn-primary,
+button.btn-primary,
+.btn-primary,
+a.cta-primary,
+button.cta-primary,
+.cta-primary {
+  background: #DF3363 !important;
+  color: #FFFFFF !important;
+  border-color: #DF3363 !important;
+  -webkit-text-fill-color: #FFFFFF !important;
+}
+
+/* Ensure text inside primary buttons is visible */
+.primary *,
+.btn-primary *,
+.cta-primary * {
+  color: #FFFFFF !important;
+  -webkit-text-fill-color: #FFFFFF !important;
+}
+
+/* Fix button hover contrast */
+a.primary:hover,
+button.primary:hover,
+a.btn-primary:hover,
+button.btn-primary:hover,
+a.cta-primary:hover,
+button.cta-primary:hover {
+  background: #B92350 !important;
+  color: #FFFFFF !important;
+}
+
+/* Keep outlined buttons elegant and readable */
+a.secondary,
+button.secondary,
+.btn-secondary,
+.cta-secondary {
+  background: #FFFCF1 !important;
+  color: #641D36 !important;
+  border: 1px solid #E9D9D5 !important;
+  -webkit-text-fill-color: #641D36 !important;
+}
+
+/* Improve heading and paragraph contrast */
+h1, h2, h3, h4 {
+  color: #641D36;
+}
+
+p {
+  color: inherit;
+}
+
+/* Prevent pink text from disappearing on pink backgrounds */
+a[style*="background"],
+button[style*="background"] {
+  text-decoration: none;
+}
+
+/* PHASE 6 — HEADER TYPOGRAPHY UPGRADE */
+
+/* Header spacing */
+header {
+  padding: 20px 32px !important;
+  min-height: 85px;
+  gap: 22px !important;
+}
+
+/* SthaniyaConnect logo */
+header h1,
+header .logo,
+header .brand,
+header .wordmark,
+nav .logo,
+nav .brand,
+nav .wordmark {
+  font-family: 'Playfair Display', Georgia, serif !important;
+  font-size: 28px !important;
+  font-weight: 700 !important;
+  letter-spacing: -0.8px;
+  line-height: 1.2;
+}
+
+/* Preserve pink highlight in the logo */
+header h1 span,
+header .logo span,
+header .brand span,
+header .wordmark span {
+  color: #DF3363 !important;
+}
+
+/* Header navigation links */
+header nav a,
+header > a,
+nav a {
+  font-family: 'DM Sans', Arial, sans-serif !important;
+  font-size: 16px !important;
+  font-weight: 600 !important;
+  line-height: 1.4;
+}
+
+/* Header subtitle on map and dashboard */
+header p,
+header .subtitle,
+header .tagline {
+  font-size: 15px !important;
+  line-height: 1.5;
+}
+
+/* Navigation button */
+header nav .primary,
+header nav .btn-primary,
+nav .primary,
+nav .btn-primary {
+  font-size: 16px !important;
+  padding: 13px 22px !important;
+}
+
+/* Mobile adjustments */
+@media (max-width: 768px) {
+  header {
+    padding: 15px 18px !important;
+    min-height: auto;
+    gap: 12px !important;
+  }
+
+  header h1,
+  header .logo,
+  header .brand,
+  header .wordmark,
+  nav .logo,
+  nav .brand,
+  nav .wordmark {
+    font-size: 22px !important;
+  }
+
+  header nav a,
+  header > a,
+  nav a {
+    font-size: 12px !important;
+  }
+
+  header p {
+    font-size: 10px !important;
+  }
+}
+
+/* PHASE 6 — REFINED EDITORIAL DESIGN */
+
+/* Softer navigation */
+header {
+  min-height: 72px !important;
+  padding: 14px 28px !important;
+  gap: 20px !important;
+  background: #FFFCF7 !important;
+}
+
+/* Elegant, restrained brand */
+header h1,
+header .logo,
+header .brand,
+header .wordmark,
+nav .logo,
+nav .brand,
+nav .wordmark {
+  font-family: 'Playfair Display', Georgia, serif !important;
+  font-size: 23px !important;
+  font-weight: 600 !important;
+  letter-spacing: -0.7px !important;
+}
+
+/* Navigation should not compete with headings */
+header nav a,
+header > a,
+nav a {
+  font-family: 'DM Sans', Arial, sans-serif !important;
+  font-size: 14px !important;
+  font-weight: 500 !important;
+  color: #735461 !important;
+  letter-spacing: 0 !important;
+}
+
+header nav a:hover,
+header > a:hover,
+nav a:hover {
+  color: #B83A62 !important;
+}
+
+/* Smaller, quieter header button */
+header nav .primary,
+header nav .btn-primary,
+nav .primary,
+nav .btn-primary {
+  font-size: 14px !important;
+  padding: 10px 17px !important;
+  font-weight: 600 !important;
+  color: #FFFFFF !important;
+  -webkit-text-fill-color: #FFFFFF !important;
+}
+
+/* Subtle main headings */
+h1, h2, h3, h4 {
+  letter-spacing: -0.035em;
+}
+
+/* Softer overall accents */
+:root {
+  --amber: #C84970;
+  --amber-soft: #D97798;
+  --cherry: #C84970;
+  --rose: #D97798;
+}
+
+/* Calm cards */
+.stat,
+.analytics-card,
+.insight,
+.tablewrap {
+  box-shadow: 0 3px 16px rgba(90,35,55,.025) !important;
+}
+
+/* Smaller, subtler hover effects */
+.stat:hover,
+.analytics-card:hover {
+  box-shadow: 0 5px 20px rgba(90,35,55,.045) !important;
+}
+
+/* Mobile */
+@media (max-width: 768px) {
+  header {
+    padding: 13px 17px !important;
+    gap: 12px !important;
+  }
+
+  header h1,
+  header .logo,
+  header .brand,
+  header .wordmark,
+  nav .logo,
+  nav .brand,
+  nav .wordmark {
+    font-size: 21px !important;
+  }
+
+  header nav a,
+  header > a,
+  nav a {
+    font-size: 13px !important;
+  }
+}
+
+/* FIX: Live map button contrast */
+
+header nav a.primary,
+header nav a.btn-primary,
+header nav a.cta-primary,
+nav a.primary,
+nav a.btn-primary,
+nav a.cta-primary {
+  background-color: #C84970 !important;
+  color: #FFFFFF !important;
+  -webkit-text-fill-color: #FFFFFF !important;
+  font-weight: 600 !important;
+}
+
+header nav a.primary:hover,
+header nav a.btn-primary:hover,
+header nav a.cta-primary:hover,
+nav a.primary:hover,
+nav a.btn-primary:hover,
+nav a.cta-primary:hover {
+  background-color: #A9365B !important;
+  color: #FFFFFF !important;
+  -webkit-text-fill-color: #FFFFFF !important;
+}
+
+/* FINAL FIX — Open the live map button */
+
+a.nav-cta,
+nav a.nav-cta,
+header nav a.nav-cta {
+  background: #C84970 !important;
+  color: #FFFFFF !important;
+  -webkit-text-fill-color: #FFFFFF !important;
+  border: 1px solid #C84970 !important;
+  font-size: 14px !important;
+  font-weight: 600 !important;
+  padding: 12px 20px !important;
+  border-radius: 6px !important;
+  text-decoration: none !important;
+}
+
+a.nav-cta:hover,
+nav a.nav-cta:hover,
+header nav a.nav-cta:hover {
+  background: #A9365B !important;
+  color: #FFFFFF !important;
+  -webkit-text-fill-color: #FFFFFF !important;
+}
